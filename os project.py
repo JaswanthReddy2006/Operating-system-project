@@ -3,7 +3,6 @@ from tkinter import ttk, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import deque
-import time
 
 
 class MemoryVisualizer:
