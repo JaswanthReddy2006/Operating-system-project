@@ -27,4 +27,4 @@ This simulator simulates the process of managing memory pages in an operating sy
 
 ## How to Run
 Download the exe file and install it in your computer.
-Google drive link: https://drive.google.com/file/d/1AxX5fWoE6gp3FZs6RUbd0Yi4qpPxfFew/view?usp=sharing
+https://drive.google.com/file/d/115FnXgSeS1q8aY9PlwERcrioyuB5Qikg/view?usp=sharing
