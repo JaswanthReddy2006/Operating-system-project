@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import random
+import time
 
 
 def fifo_paging(reference_string, num_frames):
@@ -22,6 +23,7 @@ def fifo_paging(reference_string, num_frames):
                 evicted_page = frames.pop(0)
                 frames.append(page)
                 swap_space.append(evicted_page)
+
                 frame_orders.append((list(frames), f" --> Miss (Removed -> {evicted_page})", list(swap_space), i + 1))
             misses += 1
 
@@ -166,11 +168,22 @@ def run_simulation():
         results_text.insert(tk.END, f"Miss Ratio: {miss_ratio:.4f}\n\n")
 
         results_text.insert(tk.END, "Step-by-Step Frame State:\n")
-        for frames, status, swap, step in frame_orders:
-            results_text.insert(tk.END, f"Step {step}: {frames} {status}\n")
-            results_text.insert(tk.END, f"Swap Space: {swap}\n\n")
-
         results_text.config(state=tk.DISABLED)
+
+        # Function to update the results text with a delay
+        def update_results(index):
+            if index < len(frame_orders):
+                frames, status, swap, step = frame_orders[index]
+                results_text.config(state=tk.NORMAL)
+                results_text.insert(tk.END, f"Step {step}: {frames} {status}\n")
+                results_text.insert(tk.END, f"Swap Space: {swap}\n\n")
+                results_text.config(state=tk.DISABLED)
+                results_text.see(tk.END)  # Scroll to the end
+                root.after(300, update_results, index + 1)  # Schedule the next update after 300ms
+
+        # Start the delayed updates
+        update_results(0)
+
     except ValueError as e:
         messagebox.showerror("Input Error", str(e))
 
@@ -182,51 +195,51 @@ def create_gradient(canvas, width, height, color1, color2):
         b = int(color1[2] + (color2[2] - color1[2]) * (i / height))
         color = f"#{r:02x}{g:02x}{b:02x}"
         canvas.create_line(0, i, width, i, fill=color)
-import tkinter as tk
-from tkinter import ttk
+
+
+
 
 # GUI Setup
 root = tk.Tk()
 root.title("PageControl - Memory Management Simulator")
 root.geometry("900x600")
-
-# Set Solid Background Color
-canvas = tk.Canvas(root, width=900, height=600, bg="#F5F5F5")  # Light gray for a clean look
-canvas.pack(fill="both", expand=True)
+root.configure(bg="#FFDAB9")  # Light peach background for an inviting look
 
 # Main Frame with 2 Sections
-main_frame = tk.Frame(canvas, bg="#2ECC71")
+main_frame = tk.Frame(root, bg="#FF6347", highlightbackground="#FFA07A", highlightthickness=3, relief="raised")  # Coral red with light highlights
 main_frame.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.9, relheight=0.8)
 
 # Left Section (Inputs)
-input_frame = tk.Frame(main_frame, bg="#1ABC9C")
-input_frame.pack(side="left", fill="both", expand=True, padx=20)
+input_frame = tk.Frame(main_frame, bg="#7FFFD4", highlightbackground="#40E0D0", highlightthickness=2)  # Aquamarine with turquoise borders
+input_frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
 
 # Right Section (Results)
-output_frame = tk.Frame(main_frame, bg="#3498DB")
-output_frame.pack(side="right", fill="both", expand=True, padx=20)
+output_frame = tk.Frame(main_frame, bg="#20B2AA", highlightbackground="#48D1CC", highlightthickness=2)  # Light sea green
+output_frame.pack(side="right", fill="both", expand=True, padx=20, pady=20)
 
 # Title Label
-title_label = tk.Label(canvas, text="PageControl - Memory Management", font=("Arial", 14, "bold"),
-                       bg="#E74C3C", fg="white", padx=20, pady=10)
-title_label.place(relx=0.5, rely=0.05, anchor="center")
+title_label = tk.Label(root, text="PageControl - Memory Management", font=("Comic Sans MS", 18, "bold"),
+                       bg="#FF4500", fg="white", pady=10)  # Vibrant orange-red title
+title_label.pack(fill="x", pady=10)
 
 # Style Configuration
 style = ttk.Style()
 style.theme_use("clam")
 
+# Modern Entry Field Style
 style.configure("TEntry", padding=6, font=("Arial", 11), borderwidth=0, relief="flat", foreground="black")
-style.map("TEntry", background=[("readonly", "#ECF0F1")])
+style.map("TEntry", background=[("readonly", "#FFFFE0")])  # Light yellow for disabled entries
 
-style.configure("TButton", font=("Arial", 11, "bold"), padding=10, background="#F1C40F", foreground="black", borderwidth=2)
-style.map("TButton", background=[("active", "#F39C12")])
+# Button Style with Rounded Corners
+style.configure("Rounded.TButton", font=("Arial", 12, "bold"), padding=6, background="#9370DB", foreground="white", borderwidth=0)
+style.map("Rounded.TButton", background=[("active", "#8A2BE2")])  # Purple hover effect
 
 # Input Fields
 labels = ["Total Memory (bytes):", "Page Size (bytes):", "Number of Frames:", "CPU Reference String:"]
 entries = []
 
 for text in labels:
-    label = tk.Label(input_frame, text=text, bg="#16A085", fg="white", font=("Arial", 10))
+    label = tk.Label(input_frame, text=text, bg="#7FFFD4", fg="#191970", font=("Arial", 10, "bold"))  # Midnight blue text
     label.pack(anchor="w", pady=3)
 
     entry = ttk.Entry(input_frame, style="TEntry", width=30)
@@ -236,7 +249,7 @@ for text in labels:
 memory_entry, page_size_entry, frames_entry, reference_entry = entries
 
 # Total Pages Label
-total_pages_label = tk.Label(input_frame, text="Total Pages: 0", bg="#16A085", fg="white", font=("Arial", 10))
+total_pages_label = tk.Label(input_frame, text="Total Pages: 0", bg="#7FFFD4", fg="#FF1493", font=("Arial", 10, "bold"))  # Hot pink
 total_pages_label.pack(anchor="w", pady=5)
 
 # Algorithm Selection
@@ -247,14 +260,14 @@ algorithm_dropdown.set("FIFO")
 algorithm_dropdown.pack(fill="x", pady=10)
 
 # Run Simulation Button
-run_button = ttk.Button(input_frame, text="Run Simulation", command=lambda: None)  # Placeholder command
+run_button = ttk.Button(input_frame, text="Run Simulation", style="Rounded.TButton", command=run_simulation)
 run_button.pack(fill="x", pady=10)
 
 # Results Area
-results_text = tk.Text(output_frame, wrap=tk.WORD, state=tk.DISABLED, font=("Arial", 11), bg="#000080", fg="white")  # CMD-style dark blue background
+results_text = tk.Text(output_frame, wrap=tk.WORD, state=tk.DISABLED, font=("Courier New", 11), bg="#00008B", fg="white")  # Deep blue CMD-style
 results_text.pack(fill="both", expand=True, padx=10, pady=10)
 
-# Add a scrollbar to the results text area
+# Add Scrollbar
 scrollbar = ttk.Scrollbar(output_frame, orient="vertical", command=results_text.yview)
 scrollbar.pack(side="right", fill="y")
 results_text.config(yscrollcommand=scrollbar.set)
@@ -267,7 +280,7 @@ def update_total_pages(*args):
         if total_memory <= 0 or page_size <= 0:
             raise ValueError("Memory and page size must be positive integers.")
         total_pages = total_memory // page_size
-        total_pages_label.config(text=f"Total Pages: {total_pages}")
+        total_pages_label.config(text=f"Total Pages Possible : {total_pages}")
     except ValueError:
         total_pages_label.config(text="Total Pages: 0")
 
